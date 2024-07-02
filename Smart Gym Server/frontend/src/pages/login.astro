@@ -1,0 +1,105 @@
+---
+import Layout from "../layouts/Layout.astro";
+if (Astro.cookies.has("user")) {
+  return Astro.redirect("/");
+}
+---
+
+<Layout title="Smart Gym">
+  <main>
+    <div class="flex min-h-screen w-full flex-col bg-background">
+      <main class="flex flex-1 items-center justify-center">
+        <div class="w-full max-w-md space-y-4">
+          <div class="text-center">
+            <h1 class="text-3xl font-bold">Welcome to Smart Gym</h1>
+            <p class="text-muted-foreground">
+              Please log in to access your dashboard.
+            </p>
+          </div>
+          <div
+            class="rounded-lg border bg-card text-card-foreground shadow-sm"
+            data-v0-t="card"
+          >
+            <div class="p-6 space-y-4 flex flex-col">
+              <form class="grid gap-5">
+                <div class="grid gap-1">
+                  <label
+                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    for="email"
+                  >
+                    User
+                  </label>
+                  <input
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    id="user"
+                    type="text"
+                    autofocus
+                  />
+                </div>
+                <div class="grid gap-1">
+                  <div class="flex items-center justify-between">
+                    <label
+                      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      for="password"
+                    >
+                      Password
+                    </label>
+                  </div>
+                  <input
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    id="password"
+                    type="password"
+                  />
+                </div>
+                <button
+                  class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-black text-white hover:bg-black/90 h-10 px-4 py-2 w-full"
+                  type="submit"
+                >
+                  Log in
+                </button>
+              </form>
+              <span class="text-red-500 text-center hidden" id="error"
+                >User or password is incorrect</span
+              >
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { $ } from "../lib/dom-selector";
+
+  const $form = $("form");
+  const $user = $("#user") as HTMLInputElement | null;
+  const $password = $("#password") as HTMLInputElement | null;
+  const $error = $("#error") as HTMLSpanElement | null;
+
+  $form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if ($user === null) return;
+    let user = $user.value;
+    if ($password === null) return;
+    let password = $password.value;
+    if ($error === null) return;
+	
+	$error.classList.add("hidden");
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user, password }),
+    });
+    const data = await response.json();
+	console.log(data)
+    if (data.success) {
+      document.cookie = `user=${data.user}; path=/; max-age=3600; SameSite=Strict`;
+      window.location.href = "/";
+    } else {
+      $error.classList.remove("hidden");
+    }
+  });
+</script>
