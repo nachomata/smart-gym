@@ -3,9 +3,11 @@ import time
 import display
 
 ultrasonic_ranger = 2
-bottom_threshold = 25
-top_threshold = 20
+bottom_threshold = 20
+top_threshold = 17
 exercise_end_time = 10
+# activity_timeout = 120  # 2 minutes
+activity_timeout = 30
 
 def count_repetitions(user_name):
     display.setRGB(0, 255, 255)
@@ -43,8 +45,6 @@ def count_repetitions(user_name):
         
         time.sleep(1)
 
-
-activity_timeout = 120  # 2 minutes
 
 def wait_for_resume_activity():
     start_time = time.time()
