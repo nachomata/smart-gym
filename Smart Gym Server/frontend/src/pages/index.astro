@@ -243,7 +243,6 @@ const workout_streak = workouts.reduce(
               <h3 class="whitespace-nowrap tracking-tight text-sm font-medium">
                 Recent Workouts
               </h3>
-              <a class="text-primary" href="#" rel="ugc"> View All </a>
             </div>
             <div class="p-6">
               <div class="relative w-full overflow-auto">
@@ -270,7 +269,7 @@ const workout_streak = workouts.reduce(
                       <th
                         class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0"
                       >
-                        Calories
+                        Repetitions
                       </th>
                     </tr>
                   </thead>
@@ -285,10 +284,10 @@ const workout_streak = workouts.reduce(
                             {workout.machine_id}
                           </td>
                           <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">
-                            {workout.duration} sec
+                            {workout.duration.toFixed(2)} sec
                           </td>
                           <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">
-                            {workout.repetitions * 10} cal
+                            {workout.repetitions}
                           </td>
                         </tr>
                       ))
