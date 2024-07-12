@@ -4,9 +4,15 @@ import display as display
 import requests
 import binascii
 from distance import count_repetitions, wait_for_resume_activity
+import grovepi
 
 SERVER_URL = "http://192.168.99.236:5000"
 MACHINE_ID = 1
+LED_RED = 4
+LED_GREEN = 3
+
+grovepi.pinMode(LED_RED,"OUTPUT")
+grovepi.pinMode(LED_GREEN, "OUTPUT")
 
 def authenticate_user(user_uid):
     global user_name, user_id
@@ -29,7 +35,7 @@ def authenticate_user(user_uid):
         print(f"Request failed: {e}")
         return False
 
-#user_id, machine_id, date, repetitions, weight, duration
+
 def send_session_data(user_uid, repetitions, duration):
     url = f"{SERVER_URL}/api/workouts"
     payload = {
@@ -81,8 +87,10 @@ while True:
         print("Waiting for NFC card...")
         display.setRGB(0, 255, 0)
         display.setText("Approach member card")
-        # user_uid = read_nfc()
-        user_uid = binascii.unhexlify(b'6221e100')
+        grovepi.digitalWrite(LED_GREEN, 1)
+        grovepi.digitalWrite(LED_RED, 0)
+        user_uid = read_nfc()
+        # user_uid = binascii.unhexlify(b'6221e100')
         if user_uid:
             user_uid_str = binascii.hexlify(user_uid).decode('utf-8')
             print(f"User UID: {user_uid_str}")
@@ -94,6 +102,7 @@ while True:
         print(f"Authenticating user {user_uid_str}...")
         display.setRGB(255, 255, 0)
         display.setText(f"UID: {user_uid_str} Authenticating...")
+        time.sleep(2)
         if authenticate_user(user_uid_str):
             print(f"User authenticated. ID: {user_id}, Name: {user_name}")
             display.setRGB(0, 255, 255)
@@ -109,6 +118,8 @@ while True:
 
     elif current_state == COUNT_REPETITIONS:
         print("Counting repetitions...")
+        grovepi.digitalWrite(LED_GREEN, 0)
+        grovepi.digitalWrite(LED_RED, 1)
         workout_start = time.time()
         repetitions = count_repetitions(user_name)
         workout_end = time.time()
