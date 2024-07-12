@@ -42,7 +42,7 @@ class DBHandler:
     def add_workout(self, user_id, machine_id, date, repetitions, weight, duration):
         conn = self.get_conn()
         cur = conn.cursor()
-        cur.execute("INSERT INTO workouts (user_id, machine_id, date, repetitions weight, duration) VALUES (?, ?, ?, ?, ?, ?)", (user_id, machine_id, date, repetitions, weight, duration))
+        cur.execute("INSERT INTO workouts (user_id, machine_id, date, repetitions, weight, duration) VALUES (?, ?, ?, ?, ?, ?)", (user_id, machine_id, date, repetitions, weight, duration))
         conn.commit()
         conn.close()
 
