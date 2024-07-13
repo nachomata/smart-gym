@@ -5,6 +5,7 @@ import requests
 import binascii
 from distance import count_repetitions, wait_for_resume_activity
 import grovepi
+from mqtt_client import send_session_data
 
 SERVER_URL = "http://192.168.99.236:5000"
 MACHINE_ID = 1
@@ -35,31 +36,6 @@ def authenticate_user(user_uid):
         print(f"Request failed: {e}")
         return False
 
-
-def send_session_data(user_uid, repetitions, duration):
-    url = f"{SERVER_URL}/api/workouts"
-    payload = {
-        "user_id": user_id,
-        "machine_id": MACHINE_ID,
-        "date": time.strftime("%Y-%m-%d %H:%M:%S"),
-        "repetitions": repetitions,
-        "weight": 15,
-        "duration": duration
-    }
-    try:
-        response = requests.post(url, json=payload)
-        response_data = response.json()
-        if response.status_code == 201:
-            return True
-        else:
-            print(f"Authentication failed: {response_data.get('error', 'Unknown error')}")
-            return False
-    except requests.RequestException as e:
-        print(f"Request failed: {e}")
-        return False
-    
-    
-    print(f"Session data sent for user {user_uid}: {repetitions} repetitions")
 
 # State machine states
 WAIT_FOR_NFC = "WAIT_FOR_NFC"
@@ -131,7 +107,7 @@ while True:
         display.setText("Sending workout data...")
         display.setRGB(0, 0, 255)
         workout_duration = workout_end - workout_start
-        send_session_data(user_id, repetitions, workout_duration)
+        send_session_data(user_id, repetitions, workout_duration, MACHINE_ID)
         time.sleep(2)
         display.setText("Data saved")
         display.setRGB(0, 255, 0)

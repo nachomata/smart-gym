@@ -1,2 +1,3 @@
 pn532pi
 requests
+paho-mqtt
