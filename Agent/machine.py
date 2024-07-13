@@ -5,7 +5,7 @@ import requests
 import binascii
 from distance import count_repetitions, wait_for_resume_activity
 import grovepi
-from mqtt_client import send_session_data
+import mqtt_client
 
 SERVER_URL = "http://192.168.99.236:5000"
 MACHINE_ID = 1
@@ -60,6 +60,7 @@ display.setText("Starting...")
 # State machine loop
 while True:
     if current_state == WAIT_FOR_NFC:
+        mqtt_client.send_machine_status(MACHINE_ID, mqtt_client.MACHINE_STATUS.FREE)
         print("Waiting for NFC card...")
         display.setRGB(0, 255, 0)
         display.setText("Approach member card")
@@ -83,6 +84,9 @@ while True:
             print(f"User authenticated. ID: {user_id}, Name: {user_name}")
             display.setRGB(0, 255, 255)
             display.setText(f"Welcome {user_name}")
+            grovepi.digitalWrite(LED_GREEN, 0)
+            grovepi.digitalWrite(LED_RED, 1)
+            mqtt_client.send_machine_status(MACHINE_ID, mqtt_client.MACHINE_STATUS.BUSY)
             time.sleep(2)
             current_state = COUNT_REPETITIONS
         else:
@@ -94,8 +98,6 @@ while True:
 
     elif current_state == COUNT_REPETITIONS:
         print("Counting repetitions...")
-        grovepi.digitalWrite(LED_GREEN, 0)
-        grovepi.digitalWrite(LED_RED, 1)
         workout_start = time.time()
         repetitions = count_repetitions(user_name)
         workout_end = time.time()
@@ -107,7 +109,7 @@ while True:
         display.setText("Sending workout data...")
         display.setRGB(0, 0, 255)
         workout_duration = workout_end - workout_start
-        send_session_data(user_id, repetitions, workout_duration, MACHINE_ID)
+        mqtt_client.send_session_data(user_id, repetitions, workout_duration, MACHINE_ID)
         time.sleep(2)
         display.setText("Data saved")
         display.setRGB(0, 255, 0)

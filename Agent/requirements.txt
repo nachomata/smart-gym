@@ -1,3 +1,4 @@
 pn532pi
 requests
 paho-mqtt
+python-plugwise
